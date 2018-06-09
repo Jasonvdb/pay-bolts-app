@@ -20,7 +20,7 @@ export default () => {
 					height: height < 600 ? 30 : 40,
 					resizeMode: "contain"
 				}}
-				source={require("../../../../images/logo-header.png")}
+				source={require("../../../../images/text-header.png")}
 			/>
 		</View>
 	);

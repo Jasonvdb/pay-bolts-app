@@ -8,6 +8,7 @@ import Home from "../home/Home";
 import ScanInvoice from "../home/ScanInvoice";
 import Invoices from "../invoices/Invoices";
 import Settings from "../settings/Settings";
+import Channels from "../channels/Channels";
 
 import { colors } from "../../styles/brand";
 
@@ -17,7 +18,7 @@ const generalNavigationOptions = {
 		backgroundColor: colors.brandLight,
 		borderBottomWidth: 0
 	},
-	headerTintColor: colors.brandDark,
+	headerTintColor: colors.brandPrimary,
 	headerLeft: props => {
 		const { onPress } = props;
 		return (
@@ -184,11 +185,47 @@ const SettingsScreenNavigator = StackNavigator(
 	}
 );
 
+const ChannelsScreenNavigator = StackNavigator(
+	{
+		Settings: {
+			screen: Channels
+		}
+	},
+	{
+		navigationOptions: {
+			...generalNavigationOptions,
+			//headerStyle: {
+			// ...generalNavigationOptions.headerStyle,
+			// backgroundColor: colors.brandPrimary,
+			// borderBottomWidth: 0
+			//},
+			tabBarIcon: ({ focused }) => {
+				// const source = focused
+				// 	? require("../../../images/icons/white/User.png")
+				// 	: require("../../../images/icons/gray/User.png");
+				return (
+					<Icon
+						name={"ios-swap-outline"} //ios-resize-outline
+						size={35}
+						color={
+							focused
+								? colors.brandActiveIconColor
+								: colors.brandInnactiveIconColor
+						}
+					/>
+				);
+				//return <Image style={{ width: 30, height: 30 }} source={source} />;
+			}
+		}
+	}
+);
+
 const Tabs = TabNavigator(
 	{
 		Home: { screen: HomeScreenNavigator },
 		Invoices: { screen: InvoicesScreenNavigator },
-		Settings: { screen: SettingsScreenNavigator }
+		Channels: { screen: ChannelsScreenNavigator }
+		//Settings: { screen: SettingsScreenNavigator }
 	},
 	{
 		animationEnabled: true,

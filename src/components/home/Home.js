@@ -10,6 +10,7 @@ import CustomTextInput from "../common/form/TextInput";
 import Button from "../common/Button";
 import Heading from "../common/Heading";
 import LargeIcon from "../common/LargeIcon";
+import Summary from "./Summary";
 
 class Home extends Component {
 	constructor(props) {
@@ -159,10 +160,13 @@ class Home extends Component {
 			}
 		};
 
+		const showSummary =
+			!paymentSuccessfull && !isDecodingInvoice && !isPaying && !msatoshi;
+
 		return (
 			<Container
 				actions={isPaying || isDecodingInvoice || msatoshi ? null : actions}
-				keyboardScroll
+				// keyboardScroll={!showSummary}
 			>
 				<View style={{ flex: 1, justifyContent: "space-between" }}>
 					{/* <CustomTextInput
@@ -170,6 +174,7 @@ class Home extends Component {
 							text={bolt11}
 							onChangeText={bolt11 => this.setState({ bolt11 })}
 						/> */}
+					{showSummary ? <Summary /> : null}
 					<View />
 					<View style={{ marginTop: spaces.marginTop }}>
 						{this.renderInvoice()}

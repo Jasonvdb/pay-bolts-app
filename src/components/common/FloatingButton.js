@@ -9,9 +9,17 @@ const { paddingFAB } = spaces;
 const { brandInfo, brandGrey3 } = colors;
 
 const icons = {
-	scan: <Icon name={"ios-qr-scanner"} size={30} color={colors.brandLight} />,
+	scan: (
+		<Icon
+			style={{ marginTop: 3 }}
+			name={"ios-qr-scanner"}
+			size={30}
+			color={colors.brandLight}
+		/>
+	),
 	list: <Icon name={"ios-arrow-back"} size={30} color={colors.brandLight} />,
-	arrows: <Icon name={"ios-arrow-back"} size={30} color={colors.brandLight} />
+	arrows: <Icon name={"ios-arrow-back"} size={30} color={colors.brandLight} />,
+	edit: <Icon name={"ios-create-outline"} size={30} color={colors.brandLight} />
 };
 
 const FloatingButton = ({ actions, actionIcon }) => {

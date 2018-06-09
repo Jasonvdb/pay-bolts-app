@@ -1,12 +1,5 @@
 import React, { Component } from "react";
-import {
-	StyleSheet,
-	Text,
-	View,
-	Platform,
-	Alert,
-	Dimensions
-} from "react-native";
+import { Text, View, Platform, Dimensions } from "react-native";
 import QRCodeScanner from "react-native-qrcode-scanner";
 import PropTypes from "prop-types";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -51,11 +44,18 @@ class ScanInvoice extends Component {
 					cameraStyle={{ height: "100%" }}
 					showMarker
 					customMarker={
-						<Icon
-							name={"ios-qr-scanner"}
-							size={width * 0.8}
-							color={colors.brandSeconday}
-						/>
+						<Animatable.View
+							easing="ease-in-cubic"
+							animation="zoomIn"
+							duration={500}
+							delay={1200}
+						>
+							<Icon
+								name={"ios-qr-scanner"}
+								size={width * 0.8}
+								color={colors.brandSeconday}
+							/>
+						</Animatable.View>
 					}
 					onRead={onRead}
 				/>
@@ -65,14 +65,9 @@ class ScanInvoice extends Component {
 }
 
 ScanInvoice.navigationOptions = ({ navigation }) => {
-	return Platform.select({
-		ios: {
-			headerTitle: () => <LogoHeader />
-		},
-		android: {
-			header: null
-		}
-	});
+	return {
+		headerTitle: "Scan invoice"
+	};
 };
 
 // ScanInvoice.propTypes = {

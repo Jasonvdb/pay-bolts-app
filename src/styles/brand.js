@@ -1,9 +1,5 @@
 import { Platform } from "react-native";
-//https://uigradients.com/#RainbowBlue
-//https://uigradients.com/#SublimeLight
-//https://uigradients.com/#Subu
-//https://uigradients.com/#Nepal
-//https://uigradients.com/#Ali
+
 export const colors = {
 	brandDark: "#2C3E50",
 	brandPrimary: "#1a67b4",

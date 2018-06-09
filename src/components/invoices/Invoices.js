@@ -39,14 +39,13 @@ class ViewInvoices extends Component {
 }
 
 const ViewInvoicesContainer = createContainer(({ navigation }) => {
-	Meteor.subscribe("invoices");
-	Meteor.subscribe("crypto.details");
+	// Meteor.subscribe("invoices");
+	// Meteor.subscribe("crypto.details");
 
-	const invoices =
-		Meteor.collection("invoices").find({}, { sort: { addedAt: -1 } }) || [];
-	console.log(invoices);
+	// const invoices =
+	// 	Meteor.collection("invoices").find({}, { sort: { addedAt: -1 } }) || [];
 	return {
-		invoices
+		//invoices
 	};
 }, ViewInvoices);
 

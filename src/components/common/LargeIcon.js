@@ -24,7 +24,7 @@ const LargeIcon = ({ children, type }) => {
 		<Text
 			style={{
 				color,
-				fontSize: fontSizes.h1,
+				fontSize: fontSizes.h2,
 				fontFamily
 			}}
 		>
@@ -45,7 +45,7 @@ const LargeIcon = ({ children, type }) => {
 					animation="pulse"
 					easing="ease-out"
 					iterationCount="infinite"
-					duration={500}
+					duration={450}
 				>
 					<Icon name={iconName} size={width * 0.5} color={color} />
 				</Animatable.View>

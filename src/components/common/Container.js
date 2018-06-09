@@ -58,15 +58,24 @@ const Container = ({
 		return (
 			<View style={style}>
 				<ScrollView>{newChildren}</ScrollView>
+				{actionElement}
 			</View>
 		);
 	}
 
 	if (noSafeArea) {
-		return <View style={style}>{newChildren}</View>;
+		return (
+			<View style={style}>
+				{newChildren} {actionElement}
+			</View>
+		);
 	}
 
-	return <SafeAreaView style={style}>{newChildren}</SafeAreaView>;
+	return (
+		<SafeAreaView style={style}>
+			{newChildren} {actionElement}
+		</SafeAreaView>
+	);
 };
 
 export default Container;

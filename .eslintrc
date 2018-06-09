@@ -30,6 +30,7 @@
 		"console": true,
 		"require": true,
 		"setTimeout": true,
-		"setInterval": true
+		"setInterval": true,
+		"clearInterval": true
 	}
 }
