@@ -18,20 +18,28 @@ import Heading from "../common/Heading";
 const Channel = ({ channel_id, state, spendable_msatoshi }) => {
 	return (
 		<View>
-			<Heading type="h3">State: {state}</Heading>
+			<Heading type="h4">Channel state: {state}</Heading>
 			<Heading type="h4">{spendable_msatoshi} Satoshis</Heading>
 		</View>
 	);
 };
 
-const Channels = ({ channels }) => {
+const Channels = ({ channels, connected }) => {
 	if (!channels) {
 		return null;
 	}
 
-	return channels.map(channel => (
-		<Channel key={channel.channel_id} {...channel} />
-	));
+	return (
+		<View>
+			<Heading type="h3">
+				{connected ? "Connected to peer" : "Not connected to peer"}
+			</Heading>
+			<View style={{ marginBottom: 10 }} />
+			{channels.map(channel => (
+				<Channel key={channel.channel_id} {...channel} />
+			))}
+		</View>
+	);
 };
 
 const PeerCard = ({ onPress, alias, connected, channels, showChannels }) => {
@@ -51,8 +59,7 @@ const PeerCard = ({ onPress, alias, connected, channels, showChannels }) => {
 				{/* <Image style={styles.logo} source={cryptos[ticker].sourceLogo} /> */}
 
 				<View style={styles.aliasView}>
-					<Heading type="h3">{alias}</Heading>
-					{connected ? "Connected" : "Not connected"}
+					<Heading type="h3">{alias || "-"}</Heading>
 				</View>
 
 				<View style={styles.descriptionView}>
@@ -62,7 +69,9 @@ const PeerCard = ({ onPress, alias, connected, channels, showChannels }) => {
 				</View>
 				<View style={styles.statusView}>{icon}</View>
 			</View>
-			{showChannels ? <Channels channels={channels} /> : null}
+			{showChannels ? (
+				<Channels channels={channels} connected={connected} />
+			) : null}
 		</View>
 	);
 
@@ -78,7 +87,7 @@ const PeerCard = ({ onPress, alias, connected, channels, showChannels }) => {
 
 PeerCard.propTypes = {
 	onPress: PropTypes.func.isRequired,
-	alias: PropTypes.string.isRequired,
+	alias: PropTypes.string,
 	connected: PropTypes.bool.isRequired,
 	channels: PropTypes.array.isRequired,
 	showChannels: PropTypes.bool.isRequired

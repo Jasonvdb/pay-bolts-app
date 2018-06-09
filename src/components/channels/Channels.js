@@ -1,12 +1,13 @@
 import React, { Component } from "react";
-import { Text, View, Platform } from "react-native";
-import Meteor, { createContainer } from "react-native-meteor";
+import { Text, View, Alert } from "react-native";
+import axios from "axios";
 
 import Container from "../common/Container";
 import Heading from "../common/Heading";
 import { spaces } from "../../styles/brand";
 import PeerCard from "./PeerCard";
 import LargeIcon from "../common/LargeIcon";
+import settings from "../../helpers/settings";
 
 class Channels extends Component {
 	constructor(props) {
@@ -17,9 +18,9 @@ class Channels extends Component {
 	componentDidMount() {
 		console.log("Channels mounted");
 
-		this.loadPeers();
+		this.fetchPeers();
 		this.peersInterval = setInterval(() => {
-			this.loadPeers();
+			this.fetchPeers();
 		}, 10000);
 	}
 
@@ -29,22 +30,26 @@ class Channels extends Component {
 		}
 	}
 
-	loadPeers() {
-		Meteor.call("testnet.peers", {}, (err, peers) => {
-			if (!err) {
-				if (peers) {
-					this.setState({ peers });
+	fetchPeers() {
+		const { apiBaseUrl } = settings;
+		axios
+			.get(`${apiBaseUrl}listpeers`)
+			.then(response => {
+				const { data } = response;
+				this.setState({ peers: data.peers });
+			})
+			.catch(errorResult => {
+				const { response } = errorResult;
+				if (response.data) {
+					Alert.alert("Whoops", response.data.error.message);
+				} else {
+					Alert.alert("Whoops", "An API error occured");
 				}
-			} else {
-				this.setState({ errors: err.reason, peers: null });
-			}
-		});
+			});
 	}
 
 	render() {
 		const { peers, showChannelIds } = this.state;
-
-		console.log(peers);
 
 		const actions = {
 			scan: {
@@ -98,23 +103,10 @@ class Channels extends Component {
 	}
 }
 
-const ViewChannelsContainer = createContainer(({ navigation }) => {
-	//TODO load channels into DB maybe
-	// Meteor.subscribe("invoices");
-	// Meteor.subscribe("crypto.details");
-
-	// const invoices =
-	// 	Meteor.collection("invoices").find({}, { sort: { addedAt: -1 } }) || [];
-	// console.log(invoices);
-	return {
-		//invoices
-	};
-}, Channels);
-
-ViewChannelsContainer.navigationOptions = ({ navigation }) => {
+Channels.navigationOptions = ({ navigation }) => {
 	return {
 		headerTitle: "Channels"
 	};
 };
 
-export default ViewChannelsContainer;
+export default Channels;

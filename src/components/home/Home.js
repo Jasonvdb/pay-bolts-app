@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { View, Platform, Alert } from "react-native";
 import Meteor from "react-native-meteor";
+import axios from "axios";
 
 import Container from "../common/Container";
 import { spaces } from "../../styles/brand";
@@ -11,6 +12,9 @@ import Button from "../common/Button";
 import Heading from "../common/Heading";
 import LargeIcon from "../common/LargeIcon";
 import Summary from "./Summary";
+import settings from "../../helpers/settings";
+
+const { apiBaseUrl } = settings;
 
 class Home extends Component {
 	constructor(props) {
@@ -33,25 +37,27 @@ class Home extends Component {
 
 		this.setState({ isPaying: true });
 
-		Meteor.call(
-			"testnet.pay",
-			{
-				bolt11
-			},
-			(err, invoice) => {
+		axios
+			.get(`${apiBaseUrl}pay`, {
+				params: {
+					bolt11
+				}
+			})
+			.then(response => {
 				this.setState({
 					isPaying: false
 				});
 
-				if (!err) {
-					console.log(invoice);
-					this.onSuccess();
+				this.onSuccess();
+			})
+			.catch(errorResult => {
+				const { response } = errorResult;
+				if (response.data) {
+					Alert.alert("Whoops", response.data.error.message);
 				} else {
-					console.log(err);
-					Alert.alert("Whoops", err.reason);
+					Alert.alert("Whoops", "An API error occured");
 				}
-			}
-		);
+			});
 	}
 
 	onSuccess() {
@@ -71,29 +77,30 @@ class Home extends Component {
 		const { bolt11 } = this.state;
 		this.setState({ isDecodingInvoice: true });
 
-		Meteor.call(
-			"testnet.decodepay",
-			{
-				bolt11
-			},
-			(err, invoice) => {
-				this.setState({ isDecodingInvoice: false });
-
-				this.setState({
-					isPaying: false
-				});
-				if (!err) {
-					if (invoice) {
-						const { description, msatoshi } = invoice;
-
-						this.setState({ description, msatoshi });
-					}
-				} else {
-					console.log(err);
-					Alert.alert("Whoops", err.reason);
+		axios
+			.get(`${apiBaseUrl}decodepay`, {
+				params: {
+					bolt11
 				}
-			}
-		);
+			})
+			.then(response => {
+				this.setState({ isDecodingInvoice: false, isPaying: false });
+
+				const { data } = response;
+				console.log(data.invoice);
+
+				const { description, msatoshi } = data.invoice;
+
+				this.setState({ description, msatoshi });
+			})
+			.catch(errorResult => {
+				const { response } = errorResult;
+				if (response.data) {
+					Alert.alert("Whoops", response.data.error.message);
+				} else {
+					Alert.alert("Whoops", "An API error occured");
+				}
+			});
 	}
 
 	renderInvoice() {

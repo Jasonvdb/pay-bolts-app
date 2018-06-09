@@ -1,18 +1,14 @@
 import React, { Component } from "react";
-import { View, Platform, Dimensions, Image } from "react-native";
-import Meteor from "react-native-meteor";
-import FAIcon from "react-native-vector-icons/FontAwesome";
-import Icon from "react-native-vector-icons/Ionicons";
+import { View, Alert, Image } from "react-native";
+import axios from "axios";
 
-import Container from "../common/Container";
 import { colors, spaces } from "../../styles/brand";
 import * as Animatable from "react-native-animatable";
 import Heading from "../common/Heading";
 import LargeIcon from "../common/LargeIcon";
 import satoshisConversion from "../../helpers/satoshiConversion";
 import { setCache, getCache } from "../../helpers/localcache";
-
-const { width } = Dimensions.get("window");
+import settings from "../../helpers/settings";
 
 class Summary extends Component {
 	constructor(props) {
@@ -54,17 +50,23 @@ class Summary extends Component {
 	}
 
 	fetchFunds() {
-		Meteor.call("testnet.funds", {}, (err, funds) => {
-			if (!err) {
-				if (funds) {
-					setCache("funds", funds);
-					this.setFunds(funds);
+		const { apiBaseUrl } = settings;
+
+		axios
+			.get(`${apiBaseUrl}listfunds`)
+			.then(response => {
+				const { data } = response;
+				this.setFunds(data.funds);
+				setCache("funds", data.funds);
+			})
+			.catch(errorResult => {
+				const { response } = errorResult;
+				if (response.data) {
+					Alert.alert("Whoops", response.data.error.message);
+				} else {
+					Alert.alert("Whoops", "An API error occured");
 				}
-			} else {
-				console.log(err);
-				//Alert.alert("Whoops", err.reason);
-			}
-		});
+			});
 	}
 
 	setFunds(funds) {

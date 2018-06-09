@@ -1,5 +1,5 @@
 import React from "react";
-import { Image, TouchableOpacity, Platform } from "react-native";
+import { TouchableOpacity, Platform } from "react-native";
 import { StackNavigator, TabNavigator } from "react-navigation";
 //import Icon from "react-native-vector-icons/dist/FontAwesome";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -187,7 +187,7 @@ const SettingsScreenNavigator = StackNavigator(
 
 const ChannelsScreenNavigator = StackNavigator(
 	{
-		Settings: {
+		Channels: {
 			screen: Channels
 		}
 	},
@@ -224,8 +224,8 @@ const Tabs = TabNavigator(
 	{
 		Home: { screen: HomeScreenNavigator },
 		Invoices: { screen: InvoicesScreenNavigator },
-		Channels: { screen: ChannelsScreenNavigator }
-		//Settings: { screen: SettingsScreenNavigator }
+		Channels: { screen: ChannelsScreenNavigator },
+		Settings: { screen: SettingsScreenNavigator }
 	},
 	{
 		animationEnabled: true,
