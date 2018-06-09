@@ -1,0 +1,220 @@
+import React from "react";
+import { Image, TouchableOpacity, Platform } from "react-native";
+import { StackNavigator, TabNavigator } from "react-navigation";
+//import Icon from "react-native-vector-icons/dist/FontAwesome";
+import Icon from "react-native-vector-icons/Ionicons";
+
+import Home from "../home/Home";
+import ScanInvoice from "../home/ScanInvoice";
+import Invoices from "../invoices/Invoices";
+import Settings from "../settings/Settings";
+
+import { colors } from "../../styles/brand";
+
+const generalNavigationOptions = {
+	swipeEnabled: true,
+	headerStyle: {
+		backgroundColor: colors.brandLight,
+		borderBottomWidth: 0
+	},
+	headerTintColor: colors.brandDark,
+	headerLeft: props => {
+		const { onPress } = props;
+		return (
+			<TouchableOpacity onPress={onPress} style={{ paddingLeft: 10 }}>
+				<Icon name={"ios-arrow-back"} size={30} color={colors.brandPrimary} />
+			</TouchableOpacity>
+		);
+	}
+};
+
+const HomeScreenNavigator = StackNavigator(
+	{
+		Home: { screen: Home },
+		ScanInvoice: { screen: ScanInvoice }
+		// ViewInvoice: { screen: Invoice }
+	},
+	{
+		navigationOptions: ({ navigation }) => {
+			const propertiesViewToShowTabBarOn = ["Home"];
+
+			const showTab =
+				propertiesViewToShowTabBarOn.indexOf(navigation.state.routeName) > -1;
+
+			let androidOptions = {};
+			if (showTab && Platform.OS === "android") {
+				androidOptions = {
+					header: null
+				};
+			}
+
+			return {
+				...generalNavigationOptions,
+				// headerStyle: {
+				// 	...generalNavigationOptions.headerStyle,
+				// 	backgroundColor: colors.brandPrimary,
+				// 	borderBottomWidth: 0
+				// },
+				//headerTintColor: colors.brandDark,
+				//*******HIDE TAB BAR */
+				tabBarVisible: showTab,
+				swipeEnabled: showTab,
+				//******* */
+				...androidOptions,
+				tabBarIcon: ({ focused }) => {
+					// const source = focused
+					// 	? require("../../../images/icons/white/Purse.png")
+					// 	: require("../../../images/icons/gray/Purse.png");
+					// return <Image style={{ width: 30, height: 30 }} source={source} />;
+					return (
+						<Icon
+							name={"ios-home"}
+							size={35}
+							color={
+								focused
+									? colors.brandActiveIconColor
+									: colors.brandInnactiveIconColor
+							}
+						/>
+					);
+				}
+			};
+		}
+	}
+);
+
+const InvoicesScreenNavigator = StackNavigator(
+	{
+		ViewInvoices: {
+			screen: Invoices
+		}
+		// ViewInvoice: { screen: Invoice }
+	},
+	{
+		navigationOptions: ({ navigation, screenProps }) => {
+			const propertiesViewToShowTabBarOn = ["ViewInvoices"];
+
+			const showTab =
+				propertiesViewToShowTabBarOn.indexOf(navigation.state.routeName) > -1;
+
+			let androidOptions = {};
+			if (showTab && Platform.OS === "android") {
+				androidOptions = {
+					header: null
+				};
+			}
+
+			return {
+				...generalNavigationOptions,
+				// headerStyle: {
+				// 	...generalNavigationOptions.headerStyle,
+				// 	backgroundColor: colors.brandSeconday,
+				// 	borderBottomWidth: 0
+				// },
+
+				//*******HIDE TAB BAR */
+				tabBarVisible: showTab,
+				swipeEnabled: showTab,
+				//******* */
+
+				...androidOptions,
+
+				tabBarOnPress: ({ scene, jumpToIndex }) => {
+					jumpToIndex(scene.index);
+
+					//If they're on the 'properties' tab and they tab the tab icon again, it goes to the start of the route
+					if (scene.route.index > 0 && scene.focused) {
+						navigation.goBack();
+					}
+				},
+				tabBarIcon: ({ focused }) => {
+					// const source = focused
+					// 	? require("../../../images/icons/white/List.png")
+					// 	: require("../../../images/icons/gray/List.png");
+					// return <Image style={{ width: 30, height: 30 }} source={source} />;
+					return (
+						<Icon
+							name={"ios-document"}
+							size={35}
+							color={
+								focused
+									? colors.brandActiveIconColor
+									: colors.brandInnactiveIconColor
+							}
+						/>
+					);
+				}
+			};
+		}
+	}
+);
+
+const SettingsScreenNavigator = StackNavigator(
+	{
+		Settings: {
+			screen: Settings
+		}
+	},
+	{
+		navigationOptions: {
+			...generalNavigationOptions,
+			//headerStyle: {
+			// ...generalNavigationOptions.headerStyle,
+			// backgroundColor: colors.brandPrimary,
+			// borderBottomWidth: 0
+			//},
+			tabBarIcon: ({ focused }) => {
+				// const source = focused
+				// 	? require("../../../images/icons/white/User.png")
+				// 	: require("../../../images/icons/gray/User.png");
+				return (
+					<Icon
+						name={"ios-cog"}
+						size={35}
+						color={
+							focused
+								? colors.brandActiveIconColor
+								: colors.brandInnactiveIconColor
+						}
+					/>
+				);
+				//return <Image style={{ width: 30, height: 30 }} source={source} />;
+			}
+		}
+	}
+);
+
+const Tabs = TabNavigator(
+	{
+		Home: { screen: HomeScreenNavigator },
+		Invoices: { screen: InvoicesScreenNavigator },
+		Settings: { screen: SettingsScreenNavigator }
+	},
+	{
+		animationEnabled: true,
+		lazy: false,
+
+		navigationOptions: {
+			//swipeEnabled: false //TO go back
+		},
+
+		tabBarOptions: {
+			activeTintColor: colors.brandActiveTabIconColor,
+			inactiveTintColor: colors.brandInnactiveTabIconColor,
+			showLabel: Platform.select({ ios: false, android: true }),
+			labelStyle: Platform.select({
+				ios: {},
+				android: {
+					fontSize: 12,
+					color: colors.brandActiveIconColor
+				}
+			}),
+			style: {
+				borderTopColor: "transparent", //colors.brandInnactiveTabIconColor,
+				backgroundColor: colors.brandLight //"#798eec" //
+			}
+		}
+	}
+);
+
+export default Tabs;

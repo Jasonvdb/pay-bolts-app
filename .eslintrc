@@ -1,0 +1,35 @@
+{
+	"extends": "eslint:recommended",
+	"plugins": ["react"],
+	"parserOptions": {
+		"ecmaVersion": 2017,
+		"sourceType": "module",
+		"ecmaFeatures": {
+			"jsx": true,
+			"modules": true,
+			"experimentalObjectRestSpread": true
+		}
+	},
+	"rules": {
+		"max-len": 0,
+		"global-require": 0,
+		"no-nested-ternary": 0,
+		"camelcase": 0,
+		"no-underscore-dangle": 0,
+		"indent": ["error", "tab", { "SwitchCase": 1 }],
+		"no-unused-vars": "warn",
+		"react/jsx-uses-react": "error",
+		"react/jsx-uses-vars": "error",
+		"react/jsx-no-undef": "error",
+		"no-console": "off"
+	},
+	"globals": {
+		"__DEV__": true,
+		"fetch": true,
+		"alert": true,
+		"console": true,
+		"require": true,
+		"setTimeout": true,
+		"setInterval": true
+	}
+}
