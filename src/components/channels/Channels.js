@@ -7,7 +7,7 @@ import Heading from "../common/Heading";
 import { spaces } from "../../styles/brand";
 import PeerCard from "./PeerCard";
 import LargeIcon from "../common/LargeIcon";
-import settings from "../../helpers/settings";
+import signedRequest from "../../helpers/signedRequest";
 
 class Channels extends Component {
 	constructor(props) {
@@ -31,33 +31,29 @@ class Channels extends Component {
 	}
 
 	fetchPeers() {
-		const { apiBaseUrl } = settings;
-		axios
-			.get(`${apiBaseUrl}listpeers`)
-			.then(response => {
-				const { data } = response;
+		signedRequest({
+			method: "listpeers",
+			onSuccess: data => {
 				this.setState({ peers: data.peers });
-			})
-			.catch(errorResult => {
-				const { response } = errorResult;
-				if (response.data) {
-					Alert.alert("Whoops", response.data.error.message);
-				} else {
-					Alert.alert("Whoops", "An API error occured");
-				}
-			});
+			},
+			onError: errorMessage => {
+				Alert.alert("Whoops", errorMessage);
+			}
+		});
 	}
 
 	render() {
 		const { peers, showChannelIds } = this.state;
+		const { navigation } = this.props;
 
 		const actions = {
 			scan: {
 				label: "Scan QR",
 				callback: () => {
-					// navigation.push("ScanInvoice", {
-					// 	onRead: res => this.onRead(res.data)
-					// });
+					navigation.push("ScanPeer", {
+						onRead: res => this.onRead(res.data),
+						title: "Scan peer"
+					});
 				},
 				icon: "scan"
 			}

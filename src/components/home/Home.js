@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { View, Platform, Alert } from "react-native";
-import Meteor from "react-native-meteor";
 import axios from "axios";
 
 import Container from "../common/Container";
@@ -12,9 +11,7 @@ import Button from "../common/Button";
 import Heading from "../common/Heading";
 import LargeIcon from "../common/LargeIcon";
 import Summary from "./Summary";
-import settings from "../../helpers/settings";
-
-const { apiBaseUrl } = settings;
+import signedRequest from "../../helpers/signedRequest";
 
 class Home extends Component {
 	constructor(props) {
@@ -37,33 +34,26 @@ class Home extends Component {
 
 		this.setState({ isPaying: true });
 
-		axios
-			.get(`${apiBaseUrl}pay`, {
-				params: {
-					bolt11
-				}
-			})
-			.then(response => {
+		signedRequest({
+			method: "pay",
+			params: { bolt11 },
+			onSuccess: data => {
 				this.setState({
 					isPaying: false
 				});
 
 				this.onSuccess();
-			})
-			.catch(errorResult => {
-				const { response } = errorResult;
-				if (response.data) {
-					Alert.alert("Whoops", response.data.error.message);
-				} else {
-					Alert.alert("Whoops", "An API error occured");
-				}
-			});
+			},
+			onError: errorMessage => {
+				Alert.alert("Whoops", errorMessage);
+			}
+		});
 	}
 
 	onSuccess() {
 		this.reset();
 		this.setState({ paymentSuccessfull: true }, () => {
-			setTimeout(() => this.setState({ paymentSuccessfull: false }), 6000);
+			setTimeout(() => this.setState({ paymentSuccessfull: false }), 5000);
 		});
 	}
 
@@ -77,34 +67,26 @@ class Home extends Component {
 		const { bolt11 } = this.state;
 		this.setState({ isDecodingInvoice: true });
 
-		axios
-			.get(`${apiBaseUrl}decodepay`, {
-				params: {
-					bolt11
-				}
-			})
-			.then(response => {
-				this.setState({ isDecodingInvoice: false, isPaying: false });
-
-				const { data } = response;
-				console.log(data.invoice);
-
+		signedRequest({
+			method: "decodepay",
+			params: { bolt11 },
+			onSuccess: data => {
 				const { description, msatoshi } = data.invoice;
-
-				this.setState({ description, msatoshi });
-			})
-			.catch(errorResult => {
-				const { response } = errorResult;
-				if (response.data) {
-					Alert.alert("Whoops", response.data.error.message);
-				} else {
-					Alert.alert("Whoops", "An API error occured");
-				}
-			});
+				this.setState({
+					description,
+					msatoshi,
+					isDecodingInvoice: false,
+					isPaying: false
+				});
+			},
+			onError: errorMessage => {
+				Alert.alert("Whoops", errorMessage);
+			}
+		});
 	}
 
 	renderInvoice() {
-		const { description, msatoshi, isDecodingInvoice } = this.state;
+		const { description, msatoshi } = this.state;
 
 		if (description && msatoshi) {
 			return (
@@ -160,7 +142,8 @@ class Home extends Component {
 					this.setState({ paymentSuccessfull: false });
 
 					navigation.push("ScanInvoice", {
-						onRead: res => this.onRead(res.data)
+						onRead: res => this.onRead(res.data),
+						title: "Scan invoice"
 					});
 				},
 				icon: "scan"

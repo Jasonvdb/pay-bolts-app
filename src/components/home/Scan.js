@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Text, View, Platform, Dimensions } from "react-native";
+import { Dimensions } from "react-native";
 import QRCodeScanner from "react-native-qrcode-scanner";
 import PropTypes from "prop-types";
 import Icon from "react-native-vector-icons/Ionicons";
@@ -7,36 +7,22 @@ import Icon from "react-native-vector-icons/Ionicons";
 import Container from "../common/Container";
 import { colors } from "../../styles/brand";
 import * as Animatable from "react-native-animatable";
-import LogoHeader from "../common/header/LogoHeader";
-import CustomTextInput from "../common/form/TextInput";
-import Button from "../common/Button";
 
 const { width } = Dimensions.get("window");
 
-class ScanInvoice extends Component {
+class Scan extends Component {
 	constructor(props) {
 		super(props);
 
-		this.state = {
-			enterManually: false
-		};
+		this.state = {};
 	}
 
 	componentDidMount() {}
 
 	render() {
 		const { navigation } = this.props;
-		const { enterManually } = this.state;
 
 		const { onRead } = navigation.state.params;
-
-		if (enterManually) {
-			return (
-				<View>
-					<Text>Manually</Text>
-				</View>
-			);
-		}
 
 		return (
 			<Container>
@@ -64,14 +50,14 @@ class ScanInvoice extends Component {
 	}
 }
 
-ScanInvoice.navigationOptions = ({ navigation }) => {
+Scan.navigationOptions = ({ navigation }) => {
 	return {
-		headerTitle: "Scan invoice"
+		headerTitle: navigation.state.params.title || "Scan"
 	};
 };
 
-// ScanInvoice.propTypes = {
+// Scan.propTypes = {
 // 	onRead: PropTypes.func.isRequired
 // };
 
-export default ScanInvoice;
+export default Scan;

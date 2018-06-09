@@ -4,9 +4,7 @@ import { StackNavigator } from "react-navigation";
 import Icon from "react-native-vector-icons/Ionicons";
 
 import Welcome from "../onboarding/Welcome";
-import Signin from "../onboarding/Signin";
-import Names from "../onboarding/Names";
-import Signup from "../onboarding/Signup";
+import Details from "../onboarding/Details";
 
 import { colors } from "../../styles/brand";
 
@@ -15,14 +13,8 @@ export default StackNavigator(
 		Welcome: {
 			screen: Welcome
 		},
-		Signin: {
-			screen: Signin
-		},
-		Names: {
-			screen: Names
-		},
-		Signup: {
-			screen: Signup
+		Details: {
+			screen: Details
 		}
 	},
 	{

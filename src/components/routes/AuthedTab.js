@@ -5,7 +5,7 @@ import { StackNavigator, TabNavigator } from "react-navigation";
 import Icon from "react-native-vector-icons/Ionicons";
 
 import Home from "../home/Home";
-import ScanInvoice from "../home/ScanInvoice";
+import Scan from "../home/Scan";
 import Invoices from "../invoices/Invoices";
 import Settings from "../settings/Settings";
 import Channels from "../channels/Channels";
@@ -32,7 +32,7 @@ const generalNavigationOptions = {
 const HomeScreenNavigator = StackNavigator(
 	{
 		Home: { screen: Home },
-		ScanInvoice: { screen: ScanInvoice }
+		ScanInvoice: { screen: Scan }
 		// ViewInvoice: { screen: Invoice }
 	},
 	{
@@ -93,10 +93,10 @@ const InvoicesScreenNavigator = StackNavigator(
 	},
 	{
 		navigationOptions: ({ navigation, screenProps }) => {
-			const propertiesViewToShowTabBarOn = ["ViewInvoices"];
+			const viewToShowTabBarOn = ["ViewInvoices"];
 
 			const showTab =
-				propertiesViewToShowTabBarOn.indexOf(navigation.state.routeName) > -1;
+				viewToShowTabBarOn.indexOf(navigation.state.routeName) > -1;
 
 			let androidOptions = {};
 			if (showTab && Platform.OS === "android") {
@@ -150,6 +150,109 @@ const InvoicesScreenNavigator = StackNavigator(
 	}
 );
 
+const ChannelsScreenNavigator = StackNavigator(
+	{
+		Channels: {
+			screen: Channels
+		},
+		ScanPeer: { screen: Scan }
+	},
+	{
+		navigationOptions: ({ navigation, screenProps }) => {
+			const viewToShowTabBarOn = ["Channels"];
+
+			const showTab =
+				viewToShowTabBarOn.indexOf(navigation.state.routeName) > -1;
+
+			let androidOptions = {};
+			if (showTab && Platform.OS === "android") {
+				androidOptions = {
+					header: null
+				};
+			}
+
+			return {
+				...generalNavigationOptions,
+				// headerStyle: {
+				// 	...generalNavigationOptions.headerStyle,
+				// 	backgroundColor: colors.brandSeconday,
+				// 	borderBottomWidth: 0
+				// },
+
+				//*******HIDE TAB BAR */
+				tabBarVisible: showTab,
+				swipeEnabled: showTab,
+				//******* */
+
+				...androidOptions,
+
+				tabBarOnPress: ({ scene, jumpToIndex }) => {
+					jumpToIndex(scene.index);
+
+					//If they're on the 'properties' tab and they tab the tab icon again, it goes to the start of the route
+					if (scene.route.index > 0 && scene.focused) {
+						navigation.goBack();
+					}
+				},
+				tabBarIcon: ({ focused }) => {
+					// const source = focused
+					// 	? require("../../../images/icons/white/List.png")
+					// 	: require("../../../images/icons/gray/List.png");
+					// return <Image style={{ width: 30, height: 30 }} source={source} />;
+					return (
+						<Icon
+							name={"ios-swap-outline"} //ios-resize-outline
+							size={35}
+							color={
+								focused
+									? colors.brandActiveIconColor
+									: colors.brandInnactiveIconColor
+							}
+						/>
+					);
+				}
+			};
+		}
+	}
+);
+
+// const ChannelsScreenNavigator = StackNavigator(
+// 	{
+// 		Channels: {
+// 			screen: Channels
+// 		},
+// 		ScanPeer: { screen: Scan }
+// 	},
+// 	{
+// 		navigationOptions: {
+// 			...generalNavigationOptions,
+// 			//headerStyle: {
+// 			// ...generalNavigationOptions.headerStyle,
+// 			// backgroundColor: colors.brandPrimary,
+// 			// borderBottomWidth: 0
+// 			//},
+
+// 			tabBarIcon: ({ focused }) => {
+// 				// const source = focused
+// 				// 	? require("../../../images/icons/white/User.png")
+// 				// 	: require("../../../images/icons/gray/User.png");
+// 				return (
+// 					<Icon
+// 						name={"ios-swap-outline"} //ios-resize-outline
+// 						size={35}
+// 						color={
+// 							focused
+// 								? colors.brandActiveIconColor
+// 								: colors.brandInnactiveIconColor
+// 						}
+// 					/>
+// 				);
+// 				//return <Image style={{ width: 30, height: 30 }} source={source} />;
+// 			}
+// 		}
+// 	}
+// );
+
 const SettingsScreenNavigator = StackNavigator(
 	{
 		Settings: {
@@ -171,41 +274,6 @@ const SettingsScreenNavigator = StackNavigator(
 				return (
 					<Icon
 						name={"ios-cog"}
-						size={35}
-						color={
-							focused
-								? colors.brandActiveIconColor
-								: colors.brandInnactiveIconColor
-						}
-					/>
-				);
-				//return <Image style={{ width: 30, height: 30 }} source={source} />;
-			}
-		}
-	}
-);
-
-const ChannelsScreenNavigator = StackNavigator(
-	{
-		Channels: {
-			screen: Channels
-		}
-	},
-	{
-		navigationOptions: {
-			...generalNavigationOptions,
-			//headerStyle: {
-			// ...generalNavigationOptions.headerStyle,
-			// backgroundColor: colors.brandPrimary,
-			// borderBottomWidth: 0
-			//},
-			tabBarIcon: ({ focused }) => {
-				// const source = focused
-				// 	? require("../../../images/icons/white/User.png")
-				// 	: require("../../../images/icons/gray/User.png");
-				return (
-					<Icon
-						name={"ios-swap-outline"} //ios-resize-outline
 						size={35}
 						color={
 							focused

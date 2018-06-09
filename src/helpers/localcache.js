@@ -5,7 +5,6 @@ export const setCache = async (key, dataObj, onError) => {
 	const dataString = JSON.stringify(dataObj);
 	try {
 		await AsyncStorage.setItem(key, dataString);
-		console.log(`SET ${key}`);
 	} catch (error) {
 		if (onError) {
 			onError(onError);
@@ -22,11 +21,27 @@ export const getCache = async (key, onError) => {
 		}
 
 		const data = JSON.parse(dataString);
-		console.log(`GET ${key}`);
 		return data;
 	} catch (error) {
 		if (onError) {
-			onError(onError);
+			onError(error);
+		}
+		console.log(error);
+	}
+};
+
+export const getCacheCallback = async (key, onSuccess, onError) => {
+	try {
+		const dataString = await AsyncStorage.getItem(key);
+		if (!dataString) {
+			return undefined;
+		}
+
+		const data = JSON.parse(dataString);
+		onSuccess(data);
+	} catch (error) {
+		if (onError) {
+			onError(error);
 		}
 		console.log(error);
 	}

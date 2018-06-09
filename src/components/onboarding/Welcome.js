@@ -20,13 +20,31 @@ export default class Welcome extends Component {
 					style={{
 						flex: 2,
 						alignItems: "center",
-						justifyContent: "flex-end"
+						justifyContent: "flex-start",
+						paddingTop: spaces.marginTop
 					}}
 				>
 					<Image
 						style={{
 							flex: 1,
-							width: "65%",
+							width: "82%",
+							resizeMode: Image.resizeMode.contain
+						}}
+						source={require("../../../images/text-header-white.png")}
+					/>
+				</View>
+
+				<View
+					style={{
+						flex: 2.3,
+						alignItems: "center",
+						justifyContent: "flex-start"
+					}}
+				>
+					<Image
+						style={{
+							flex: 1,
+							width: "55%",
 							resizeMode: Image.resizeMode.contain
 						}}
 						source={require("../../../images/logo.png")}
@@ -35,10 +53,9 @@ export default class Welcome extends Component {
 
 				<View
 					style={{
-						flex: 2,
-						flexDirection: "column",
-						justifyContent: "space-between",
-						paddingBottom: 25
+						flex: 1,
+						alignItems: "center",
+						justifyContent: "center"
 					}}
 				>
 					<Heading
@@ -50,20 +67,22 @@ export default class Welcome extends Component {
 					>
 						Simplified Bitcoin lightning payments
 					</Heading>
+				</View>
 
+				<View
+					style={{
+						flex: 2,
+						flexDirection: "column",
+						justifyContent: "flex-end",
+						paddingBottom: 25
+					}}
+				>
 					<View>
 						<Button
 							type="info"
-							title="Sign up"
+							title="Connect to node"
 							showAnimated={true}
-							onPress={() => navigation.navigate("Names")}
-						/>
-						<View style={{ paddingBottom: spaces.paddingBottom / 2 }} />
-						<Button
-							type="default"
-							title="Login"
-							showAnimated={true}
-							onPress={() => navigation.navigate("Signin")}
+							onPress={() => navigation.navigate("Details")}
 						/>
 					</View>
 				</View>

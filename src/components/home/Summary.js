@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import { View, Alert, Image } from "react-native";
-import axios from "axios";
+import { View, Alert, Image, TouchableOpacity } from "react-native";
+import Icon from "react-native-vector-icons/Ionicons";
 
 import { colors, spaces } from "../../styles/brand";
 import * as Animatable from "react-native-animatable";
@@ -8,7 +8,7 @@ import Heading from "../common/Heading";
 import LargeIcon from "../common/LargeIcon";
 import satoshisConversion from "../../helpers/satoshiConversion";
 import { setCache, getCache } from "../../helpers/localcache";
-import settings from "../../helpers/settings";
+import signedRequest from "../../helpers/signedRequest";
 
 class Summary extends Component {
 	constructor(props) {
@@ -17,30 +17,40 @@ class Summary extends Component {
 		this.state = {
 			inWalletSathosis: null,
 			onChannelSatoshis: null,
-			isLoading: false
+			isLoading: false,
+			isConnected: null,
+			network: null
 		};
 	}
 
 	componentDidMount() {
-		console.log("Channels mounted");
-
-		this.fetchFunds();
-		this.fundsInterval = setInterval(() => {
-			this.fetchFunds();
-		}, 20000);
-
+		this.startInterval();
 		this.loadFromCache();
+		this.componentIsMounted = true;
+	}
+
+	startInterval() {
+		this.stopInterval();
+		this.fetchUpdates();
+		this.interval = setInterval(() => {
+			this.fetchUpdates();
+		}, 20000);
 	}
 
 	componentWillUnmount() {
-		if (this.fundsInterval) {
-			clearInterval(this.fundsInterval);
+		this.componentIsMounted = false;
+
+		this.stopInterval();
+	}
+
+	stopInterval() {
+		if (this.interval) {
+			clearInterval(this.interval);
 		}
 	}
 
 	async loadFromCache() {
 		const funds = await getCache("funds");
-		console.log("CAHSH", funds);
 		if (funds) {
 			this.setFunds(funds);
 		} else {
@@ -49,24 +59,33 @@ class Summary extends Component {
 		}
 	}
 
-	fetchFunds() {
-		const { apiBaseUrl } = settings;
-
-		axios
-			.get(`${apiBaseUrl}listfunds`)
-			.then(response => {
-				const { data } = response;
-				this.setFunds(data.funds);
-				setCache("funds", data.funds);
-			})
-			.catch(errorResult => {
-				const { response } = errorResult;
-				if (response.data) {
-					Alert.alert("Whoops", response.data.error.message);
-				} else {
-					Alert.alert("Whoops", "An API error occured");
+	fetchUpdates() {
+		signedRequest({
+			method: "listfunds",
+			onSuccess: data => {
+				if (this.componentIsMounted) {
+					this.setFunds(data.funds);
+					setCache("funds", data.funds);
 				}
-			});
+			},
+			onError: errorMessage => {
+				Alert.alert("Whoops", errorMessage);
+			}
+		});
+
+		signedRequest({
+			method: "getinfo",
+			onSuccess: data => {
+				if (this.componentIsMounted) {
+					const { network } = data.info;
+					this.setState({ isConnected: true, network });
+				}
+			},
+			onError: errorMessage => {
+				this.setState({ isConnected: false });
+				Alert.alert("Whoops", errorMessage);
+			}
+		});
 	}
 
 	setFunds(funds) {
@@ -81,7 +100,51 @@ class Summary extends Component {
 			onChannelSatoshis = onChannelSatoshis + channel_sat;
 		});
 
-		this.setState({ inWalletSathosis, onChannelSatoshis });
+		if (this.componentIsMounted) {
+			this.setState({ inWalletSathosis, onChannelSatoshis });
+		}
+	}
+
+	renderConectionStatus() {
+		const { isConnected, network } = this.state;
+
+		let iconName = "ios-time-outline";
+		let color = colors.brandDisabled;
+		let text = "Connecting...";
+
+		if (isConnected === true) {
+			iconName = "ios-checkmark-circle-outline";
+			color = colors.brandSeconday;
+			text = "Connected";
+		} else if (isConnected === false) {
+			iconName = "ios-close-circle-outline";
+			color = colors.brandInfo;
+			text = "Connection failed";
+		}
+
+		const inner = (
+			<View style={{ flexDirection: "row", alignItems: "flex-start" }}>
+				<Icon name={iconName} size={20} color={color} />
+				<View style={{ marginLeft: 5 }} />
+				<Heading textStyle={{ color }} type="h4">
+					{text} {network ? `(${network})` : ""}
+				</Heading>
+			</View>
+		);
+
+		if (isConnected === false) {
+			return (
+				<TouchableOpacity
+					onPress={() =>
+						this.setState({ isConnected: null }, () => this.startInterval())
+					}
+				>
+					{inner}
+				</TouchableOpacity>
+			);
+		}
+
+		return inner;
 	}
 
 	renderBalances() {
@@ -121,7 +184,7 @@ class Summary extends Component {
 					style={{ justifyContent: "center", alignItems: "center", flex: 3 }}
 				>
 					<Heading type="h2">Wallet balance:</Heading>
-					<Heading type="h1" textStyle={{ color: colors.brandSeconday }}>
+					<Heading type="h1">
 						{satoshisConversion(inWalletSathosis).toFixed(6)} BTC
 					</Heading>
 				</Animatable.View>
@@ -132,9 +195,18 @@ class Summary extends Component {
 					style={{ justifyContent: "center", alignItems: "center", flex: 3 }}
 				>
 					<Heading type="h2">Channel balance:</Heading>
-					<Heading type="h1" textStyle={{ color: colors.brandSeconday }}>
+					<Heading type="h1">
 						{satoshisConversion(onChannelSatoshis).toFixed(6)} BTC
 					</Heading>
+				</Animatable.View>
+
+				<Animatable.View
+					easing="ease-in"
+					animation="fadeIn"
+					duration={600}
+					style={{ justifyContent: "center", alignItems: "center", flex: 1 }}
+				>
+					{this.renderConectionStatus()}
 				</Animatable.View>
 			</View>
 		);

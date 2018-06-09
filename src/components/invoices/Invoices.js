@@ -1,12 +1,11 @@
 import React, { Component } from "react";
 import { Text, View, Platform } from "react-native";
-import Meteor, { createContainer } from "react-native-meteor";
 
 import Container from "../common/Container";
 import Heading from "../common/Heading";
 import { spaces } from "../../styles/brand";
 
-class ViewInvoices extends Component {
+class Invoices extends Component {
 	constructor(props) {
 		super(props);
 
@@ -17,7 +16,7 @@ class ViewInvoices extends Component {
 	}
 
 	render() {
-		const { invoices, navigation } = this.props;
+		const { navigation } = this.props;
 		// console.log(invoices);
 		// if (invoices && invoices.length > 0) {
 		// 	return (
@@ -38,21 +37,10 @@ class ViewInvoices extends Component {
 	}
 }
 
-const ViewInvoicesContainer = createContainer(({ navigation }) => {
-	// Meteor.subscribe("invoices");
-	// Meteor.subscribe("crypto.details");
-
-	// const invoices =
-	// 	Meteor.collection("invoices").find({}, { sort: { addedAt: -1 } }) || [];
-	return {
-		//invoices
-	};
-}, ViewInvoices);
-
-ViewInvoicesContainer.navigationOptions = ({ navigation }) => {
+Invoices.navigationOptions = ({ navigation }) => {
 	return {
 		headerTitle: "Invoices"
 	};
 };
 
-export default ViewInvoicesContainer;
+export default Invoices;
