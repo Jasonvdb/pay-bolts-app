@@ -1,11 +1,13 @@
 import React, { Component } from "react";
 import { Image, View, Alert } from "react-native";
 import axios from "axios";
+import crypto from "crypto";
 
 import Container from "../common/Container";
 import Button from "../common/Button";
 import TextInput from "../common/form/TextInput";
 import { setCache } from "../../helpers/localcache";
+import signedRequest from "../../helpers/signedRequest";
 
 export default class Details extends Component {
 	constructor(props) {
@@ -13,43 +15,47 @@ export default class Details extends Component {
 
 		this.state = {
 			isSubmitting: false,
-			apiUrl: "",
+			apiUrl: __DEV__ ? "https://lighting-testnet.paybolts.com/" : "",
 			apiKey: "",
 			secret: ""
 		};
 	}
 
 	onSubmit() {
-		const { apiUrl } = this.state;
+		const { apiUrl, apiKey, secret } = this.state;
+
+		if (!apiUrl || !apiKey || !secret) {
+			return Alert.alert("Whoops", "Please complete all fields.");
+		}
+
 		this.setState({ isSubmitting: true });
-		axios
-			.get(`${apiUrl}api/getinfo`)
-			.then(response => {
-				const { data } = response;
+		console.log("Checking details...");
+		signedRequest({
+			apiUrl,
+			apiKey,
+			secret,
+			method: "getinfo",
+			onSuccess: data => {
 				console.log(data);
 				const { info } = data;
 				Alert.alert("Connected", `ID: ${info.id}`);
+
 				setCache("apiUrl", apiUrl);
-			})
-			.catch(errorResult => {
+				setCache("apiKey", apiKey);
+				setCache("secret", secret);
+			},
+			onError: errorMessage => {
 				this.setState({ isSubmitting: false });
 
-				const { response } = errorResult;
-				if (response) {
-					if (response.data && response.data.error) {
-						Alert.alert("Whoops", response.data.error.message);
-					} else {
-						Alert.alert("Whoops", "An API error occured");
-					}
-				} else {
-					Alert.alert("Whoops", "Looks like we can't connect to that URL");
-				}
-			});
+				Alert.alert("Whoops", errorMessage);
+			}
+		});
 	}
 
 	randomString(length) {
 		const chars =
-			"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-";
+			"0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
 		var result = "";
 		for (var i = length; i > 0; --i)
 			result += chars[Math.floor(Math.random() * chars.length)];
@@ -58,9 +64,19 @@ export default class Details extends Component {
 
 	generateNew() {
 		const apiKey = this.randomString(32);
-		const secret = this.randomString(32);
 
-		this.setState({ apiKey, secret });
+		const hash = crypto.createHash("sha256");
+
+		hash.on("readable", () => {
+			const data = hash.read();
+			if (data) {
+				const secret = data.toString("hex");
+				this.setState({ apiKey, secret });
+			}
+		});
+
+		hash.write(this.randomString(32));
+		hash.end();
 	}
 
 	render() {
@@ -115,7 +131,7 @@ export default class Details extends Component {
 							white
 							label="Your node IP or URL"
 							text={apiUrl}
-							onChangeText={url => this.setState({ url })}
+							onChangeText={apiUrl => this.setState({ apiUrl })}
 						/>
 						<View style={{ marginTop: 30 }} />
 						<TextInput
@@ -136,7 +152,7 @@ export default class Details extends Component {
 						disabled={isSubmitting}
 						//type="secondary"
 						size="small"
-						title={"Generate new key"}
+						title={"Generate new pair"}
 						onPress={this.generateNew.bind(this)}
 					/>
 					<View style={{ marginTop: 20 }} />

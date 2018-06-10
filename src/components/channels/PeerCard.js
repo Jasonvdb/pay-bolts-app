@@ -15,11 +15,41 @@ import PropTypes from "prop-types";
 import { colors, spaces } from "../../styles/brand";
 import Heading from "../common/Heading";
 
+const StatusIcon = ({ connected, channels }) => {
+	let name = "ios-help-outline";
+	let color = colors.brandDark;
+
+	if (connected) {
+		name = "ios-checkmark-circle";
+		color = colors.brandSeconday;
+	} else {
+		name = "ios-close-circle";
+		color = colors.brandDisabled;
+	}
+
+	if (channels) {
+		channels.forEach(({ state }) => {
+			if (state === "CHANNELD_AWAITING_LOCKIN" || state === "OPENINGD") {
+				name = "ios-time-outline";
+				color = colors.brandPrimary;
+			}
+		});
+	} else {
+		//No channels yet
+		name = "ios-time-outline";
+		color = colors.brandPrimary;
+	}
+
+	return <Icon name={name} size={40} color={color} />;
+};
+
 const Channel = ({ channel_id, state, spendable_msatoshi }) => {
 	return (
 		<View>
 			<Heading type="h4">Channel state: {state}</Heading>
-			<Heading type="h4">{spendable_msatoshi} Satoshis</Heading>
+			{spendable_msatoshi ? (
+				<Heading type="h4">{spendable_msatoshi} Satoshis</Heading>
+			) : null}
 		</View>
 	);
 };
@@ -36,23 +66,13 @@ const Channels = ({ channels, connected }) => {
 			</Heading>
 			<View style={{ marginBottom: 10 }} />
 			{channels.map(channel => (
-				<Channel key={channel.channel_id} {...channel} />
+				<Channel key={channel.channel_id || Math.random()} {...channel} />
 			))}
 		</View>
 	);
 };
 
 const PeerCard = ({ onPress, alias, connected, channels, showChannels }) => {
-	const icon = connected ? (
-		<Icon
-			name={"ios-checkmark-circle"}
-			size={40}
-			color={colors.brandSeconday}
-		/>
-	) : (
-		<Icon name={"ios-close-circle"} size={40} color={colors.brandDisabled} />
-	);
-
 	const card = (
 		<View style={styles.card}>
 			<View style={styles.cardBody}>
@@ -67,7 +87,9 @@ const PeerCard = ({ onPress, alias, connected, channels, showChannels }) => {
 						Channels: {channels ? channels.length : 0}
 					</Heading>
 				</View>
-				<View style={styles.statusView}>{icon}</View>
+				<View style={styles.statusView}>
+					<StatusIcon connected={connected} channels={channels} />
+				</View>
 			</View>
 			{showChannels ? (
 				<Channels channels={channels} connected={connected} />
@@ -89,7 +111,7 @@ PeerCard.propTypes = {
 	onPress: PropTypes.func.isRequired,
 	alias: PropTypes.string,
 	connected: PropTypes.bool.isRequired,
-	channels: PropTypes.array.isRequired,
+	channels: PropTypes.array,
 	showChannels: PropTypes.bool.isRequired
 };
 

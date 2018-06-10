@@ -7,35 +7,67 @@ import { spaces } from "../../styles/brand";
 import TextInput from "../common/form/TextInput";
 import RightButton from "../common/header/RightButton";
 import { getCache } from "../../helpers/localcache";
+import signedRequest from "../../helpers/signedRequest";
+import Heading from "../common/Heading";
+
+const NodeDetail = ({ label, value }) => {
+	return (
+		<View>
+			<Heading type="h3">{label}:</Heading>
+			<Heading type="h2">{value || "-"}</Heading>
+		</View>
+	);
+};
 
 class Settings extends Component {
 	constructor(props) {
 		super(props);
 
-		//TODO load 'getinfo'
-		//Set these strings to false first so we know to use the vars from the prop
 		this.state = {
-			isSubmitting: false
+			blockheight: null,
+			id: null,
+			network: null,
+			version: null
 		};
 	}
 
-	componentDidMount() {}
+	componentDidMount() {
+		signedRequest({
+			method: "getinfo",
+			onSuccess: data => {
+				console.log(data.info);
+				this.setState({ ...data.info });
+			},
+			onError: errorMessage => {
+				Alert.alert("Whoops", errorMessage);
+			}
+		});
+	}
 
 	render() {
-		const { isSubmitting } = this.state;
+		const { blockheight, id, network, version } = this.state;
+
+		const viewStyle = { marginBottom: 20 };
 
 		return (
-			<Container keyboardScroll>
+			<Container>
 				<View
 					style={{
 						marginTop: spaces.marginTop,
 						flex: 1,
 						flexDirection: "column",
-						justifyContent: "space-between",
-						marginBottom: spaces.marginBottom
+						justifyContent: "space-around",
+						marginBottom: spaces.marginBottom,
+						paddingLeft: spaces.paddingSide,
+						paddingRight: spaces.paddingSide
 					}}
 				>
-					<Text>Settings</Text>
+					<NodeDetail label={"Blockheight"} value={blockheight} />
+					<NodeDetail label={"Network"} value={network} />
+					<NodeDetail label={"Node ID"} value={id} />
+					<NodeDetail label={"Node version"} value={version} />
+					<View />
+					<View />
 				</View>
 			</Container>
 		);

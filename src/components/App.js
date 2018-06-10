@@ -33,8 +33,8 @@ class App extends Component {
 		const secret = await getCache("secret");
 
 		if (apiUrl && apiKey && secret) {
-			this.setState({ isSetup: true });
-			this.stopInterval();
+			this.setState({ isSetup: true }, ()=>this.stopInterval());
+			
 		} else {
 			this.setState({ isSetup: false });
 		}

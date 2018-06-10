@@ -9,6 +9,7 @@ import LargeIcon from "../common/LargeIcon";
 import satoshisConversion from "../../helpers/satoshiConversion";
 import { setCache, getCache } from "../../helpers/localcache";
 import signedRequest from "../../helpers/signedRequest";
+import getExchangeRate from "../../helpers/getExchangeRate";
 
 class Summary extends Component {
 	constructor(props) {
@@ -19,7 +20,9 @@ class Summary extends Component {
 			onChannelSatoshis: null,
 			isLoading: false,
 			isConnected: null,
-			network: null
+			network: null,
+			currentExchangeRate: null,
+			currentFiatSymbol: null
 		};
 	}
 
@@ -92,7 +95,8 @@ class Summary extends Component {
 		let inWalletSathosis = 0;
 		let onChannelSatoshis = 0;
 		const { outputs, channels } = funds;
-		outputs.forEach(({ value, status }) => {
+		outputs.forEach(output => {
+			const { value, status } = output;
 			inWalletSathosis = inWalletSathosis + value;
 		});
 
@@ -101,7 +105,19 @@ class Summary extends Component {
 		});
 
 		if (this.componentIsMounted) {
-			this.setState({ inWalletSathosis, onChannelSatoshis });
+			this.setState({ inWalletSathosis, onChannelSatoshis }, () => {
+				getExchangeRate(
+					({ value, symbol }) => {
+						this.setState({
+							currentExchangeRate: value,
+							currentFiatSymbol: symbol
+						});
+					},
+					errorMessage => {
+						Alert.alert("Whoops", errorMessage);
+					}
+				);
+			});
 		}
 	}
 
@@ -148,7 +164,12 @@ class Summary extends Component {
 	}
 
 	renderBalances() {
-		const { inWalletSathosis, onChannelSatoshis } = this.state;
+		const {
+			inWalletSathosis,
+			onChannelSatoshis,
+			currentExchangeRate,
+			currentFiatSymbol
+		} = this.state;
 
 		return (
 			<View
@@ -165,7 +186,7 @@ class Summary extends Component {
 						justifyContent: "center",
 						alignItems: "center",
 						marginTop: spaces.marginTop,
-						flex: 5
+						flex: 4
 					}}
 				>
 					<Image
@@ -184,7 +205,15 @@ class Summary extends Component {
 					style={{ justifyContent: "center", alignItems: "center", flex: 3 }}
 				>
 					<Heading type="h2">Wallet balance:</Heading>
-					<Heading type="h1">
+					{currentExchangeRate ? (
+						<Heading type="h1">
+							{(
+								satoshisConversion(inWalletSathosis) * currentExchangeRate
+							).toFixed(2)}{" "}
+							{currentFiatSymbol}
+						</Heading>
+					) : null}
+					<Heading type="h3">
 						{satoshisConversion(inWalletSathosis).toFixed(6)} BTC
 					</Heading>
 				</Animatable.View>
@@ -195,7 +224,15 @@ class Summary extends Component {
 					style={{ justifyContent: "center", alignItems: "center", flex: 3 }}
 				>
 					<Heading type="h2">Channel balance:</Heading>
-					<Heading type="h1">
+					{currentExchangeRate ? (
+						<Heading type="h1">
+							{(
+								satoshisConversion(onChannelSatoshis) * currentExchangeRate
+							).toFixed(2)}{" "}
+							{currentFiatSymbol}
+						</Heading>
+					) : null}
+					<Heading type="h3">
 						{satoshisConversion(onChannelSatoshis).toFixed(6)} BTC
 					</Heading>
 				</Animatable.View>

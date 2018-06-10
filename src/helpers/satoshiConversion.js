@@ -1,7 +1,10 @@
-export default (satoshis, symbol = "BTC") => {
-	if (symbol === "BTC") {
-		return satoshis * 0.00000001;
+export default (satoshis, satoshisDecimal = null) => {
+	let btcValue = satoshis / 100000000;
+
+	//Milli satoshis?
+	if (satoshisDecimal === "m") {
+		return btcValue / 100;
 	}
 
-	return "-";
+	return btcValue;
 };

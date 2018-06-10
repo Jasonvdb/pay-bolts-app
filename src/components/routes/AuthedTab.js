@@ -6,7 +6,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 
 import Home from "../home/Home";
 import Scan from "../home/Scan";
-import Invoices from "../invoices/Invoices";
+import Transactions from "../transactions/Transactions";
 import Settings from "../settings/Settings";
 import Channels from "../channels/Channels";
 
@@ -86,14 +86,14 @@ const HomeScreenNavigator = StackNavigator(
 
 const InvoicesScreenNavigator = StackNavigator(
 	{
-		ViewInvoices: {
-			screen: Invoices
+		ViewTransactions: {
+			screen: Transactions
 		}
 		// ViewInvoice: { screen: Invoice }
 	},
 	{
 		navigationOptions: ({ navigation, screenProps }) => {
-			const viewToShowTabBarOn = ["ViewInvoices"];
+			const viewToShowTabBarOn = ["ViewTransactions"];
 
 			const showTab =
 				viewToShowTabBarOn.indexOf(navigation.state.routeName) > -1;

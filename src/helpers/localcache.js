@@ -34,7 +34,7 @@ export const getCacheCallback = async (key, onSuccess, onError) => {
 	try {
 		const dataString = await AsyncStorage.getItem(key);
 		if (!dataString) {
-			return undefined;
+			return onError("Missing value");
 		}
 
 		const data = JSON.parse(dataString);

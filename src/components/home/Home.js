@@ -12,6 +12,8 @@ import Heading from "../common/Heading";
 import LargeIcon from "../common/LargeIcon";
 import Summary from "./Summary";
 import signedRequest from "../../helpers/signedRequest";
+import getExchangeRate from "../../helpers/getExchangeRate";
+import satoshiConversion from "../../helpers/satoshiConversion";
 
 class Home extends Component {
 	constructor(props) {
@@ -23,7 +25,9 @@ class Home extends Component {
 			isDecodingInvoice: false,
 			description: "",
 			msatoshi: "",
-			paymentSuccessfull: false
+			paymentSuccessfull: false,
+			currentExchangeRate: null,
+			currentFiatSymbol: null
 		};
 	}
 
@@ -36,7 +40,7 @@ class Home extends Component {
 
 		signedRequest({
 			method: "pay",
-			params: { bolt11 },
+			params: { bolt11, maxfeepercent: 2 }, //TODO allow them to set this value
 			onSuccess: data => {
 				this.setState({
 					isPaying: false
@@ -45,6 +49,8 @@ class Home extends Component {
 				this.onSuccess();
 			},
 			onError: errorMessage => {
+				this.setState({ isPaying: false });
+
 				Alert.alert("Whoops", errorMessage);
 			}
 		});
@@ -72,6 +78,19 @@ class Home extends Component {
 			params: { bolt11 },
 			onSuccess: data => {
 				const { description, msatoshi } = data.invoice;
+
+				getExchangeRate(
+					({ value, symbol }) => {
+						this.setState({
+							currentExchangeRate: value,
+							currentFiatSymbol: symbol
+						});
+					},
+					errorMessage => {
+						Alert.alert("Whoops", errorMessage);
+					}
+				);
+
 				this.setState({
 					description,
 					msatoshi,
@@ -80,15 +99,23 @@ class Home extends Component {
 				});
 			},
 			onError: errorMessage => {
-				Alert.alert("Whoops", errorMessage);
+				this.setState({ isDecodingInvoice: false }, () => {
+					Alert.alert("Whoops", errorMessage);
+				});
 			}
 		});
 	}
 
 	renderInvoice() {
-		const { description, msatoshi } = this.state;
+		const {
+			description,
+			msatoshi,
+			currentExchangeRate,
+			currentFiatSymbol
+		} = this.state;
 
 		if (description && msatoshi) {
+			const bitcoinValue = satoshiConversion(msatoshi, "m");
 			return (
 				<View>
 					<Animatable.View
@@ -106,7 +133,14 @@ class Home extends Component {
 						duration={200}
 						delay={200}
 					>
-						<Heading type={"h2"}>{msatoshi} Satoshis</Heading>
+						{currentExchangeRate && currentFiatSymbol ? (
+							<Heading type={"h1"}>
+								{(bitcoinValue * currentExchangeRate).toFixed(2)}{" "}
+								{currentFiatSymbol}
+							</Heading>
+						) : null}
+
+						<Heading type={"h2"}>{msatoshi / 100} Satoshis</Heading>
 					</Animatable.View>
 				</View>
 			);
