@@ -3,6 +3,7 @@ package com.payboltsapp;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.hieuvp.fingerprint.ReactNativeFingerprintScannerPackage;
 import com.bitgo.randombytes.RandomBytesPackage;
 import org.reactnative.camera.RNCameraPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
@@ -26,6 +27,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new ReactNativeFingerprintScannerPackage(),
             new RandomBytesPackage(),
             new RNCameraPackage(),
             new VectorIconsPackage()

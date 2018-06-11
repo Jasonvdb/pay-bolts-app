@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { View, Platform, Alert } from "react-native";
-import axios from "axios";
+import FingerprintScanner from "react-native-fingerprint-scanner";
 
 import Container from "../common/Container";
 import { spaces } from "../../styles/brand";
@@ -33,7 +33,26 @@ class Home extends Component {
 
 	componentDidMount() {}
 
-	onSubmit() {
+	checkFingerprint() {
+		//Check with fingerprint, only for ios. Android might need extra setup
+		//https://github.com/hieuvp/react-native-fingerprint-scanner
+		if (Platform.OS === "ios") {
+			FingerprintScanner.authenticate({
+				description: "Scan your fingerprint to pay."
+			})
+				.then(() => {
+					this.onPay();
+				})
+				.catch(error => {
+					console.log(error);
+					Alert.alert("Whoops", "Authentication failed.");
+				});
+		} else {
+			this.onPay();
+		}
+	}
+
+	onPay() {
 		const { bolt11 } = this.state;
 
 		this.setState({ isPaying: true });
@@ -218,7 +237,7 @@ class Home extends Component {
 							showAnimated={!isPaying && !!bolt11 && !!msatoshi}
 							title={isPaying ? "Paying..." : "Pay"}
 							type="secondary"
-							onPress={() => this.onSubmit()}
+							onPress={() => this.checkFingerprint()}
 						/>
 
 						<Button

@@ -35,7 +35,6 @@ class Settings extends Component {
 		signedRequest({
 			method: "getinfo",
 			onSuccess: data => {
-				console.log(data.info);
 				this.setState({ ...data.info });
 			},
 			onError: errorMessage => {

@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Alert, Image, TouchableOpacity } from "react-native";
+import { View, Alert, Image, TouchableOpacity, AppState } from "react-native";
 import Icon from "react-native-vector-icons/Ionicons";
 
 import { colors, spaces } from "../../styles/brand";
@@ -30,6 +30,8 @@ class Summary extends Component {
 		this.startInterval();
 		this.loadFromCache();
 		this.componentIsMounted = true;
+
+		AppState.addEventListener("change", this.handleAppStateChange.bind(this));
 	}
 
 	startInterval() {
@@ -44,6 +46,22 @@ class Summary extends Component {
 		this.componentIsMounted = false;
 
 		this.stopInterval();
+
+		AppState.removeEventListener(
+			"change",
+			this.handleAppStateChange.bind(this)
+		);
+	}
+
+	handleAppStateChange(nextAppState) {
+		if (nextAppState !== this.currentAppState) {
+			if (nextAppState === "active") {
+				this.setState({ isConnected: null }, () => this.startInterval());
+			} else {
+				this.stopInterval();
+			}
+		}
+		this.currentAppState = nextAppState;
 	}
 
 	stopInterval() {
@@ -143,7 +161,8 @@ class Summary extends Component {
 				<Icon name={iconName} size={20} color={color} />
 				<View style={{ marginLeft: 5 }} />
 				<Heading textStyle={{ color }} type="h4">
-					{text} {network ? `(${network})` : ""}
+					{text}
+					{network && isConnected === true ? ` (${network})` : ""}
 				</Heading>
 			</View>
 		);

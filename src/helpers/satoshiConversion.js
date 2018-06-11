@@ -1,10 +1,8 @@
 export default (satoshis, satoshisDecimal = null) => {
-	let btcValue = satoshis / 100000000;
-
 	//Milli satoshis?
 	if (satoshisDecimal === "m") {
-		return btcValue / 100;
+		return satoshis * 0.00000000001;
+	} else {
+		return satoshis * 0.00000001;
 	}
-
-	return btcValue;
 };
