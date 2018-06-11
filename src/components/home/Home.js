@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { View, Platform, Alert } from "react-native";
+import { View, Platform, Alert, Linking } from "react-native";
 import FingerprintScanner from "react-native-fingerprint-scanner";
 
 import Container from "../common/Container";
@@ -31,7 +31,30 @@ class Home extends Component {
 		};
 	}
 
-	componentDidMount() {}
+	componentDidMount() {
+		if (Platform.OS === "android") {
+			Linking.getInitialURL().then(url => {
+				console.log("FIXME => open this", url);
+				//TODO DO ANROUD CONFIG https://medium.com/react-native-training/deep-linking-your-react-native-app-d87c39a1ad5e
+			});
+		} else {
+			Linking.addEventListener("url", this.handleOpenURL.bind(this));
+		}
+	}
+
+	componentWillUnmount() {
+		Linking.removeEventListener("url", this.handleOpenURL.bind(this));
+	}
+
+	handleOpenURL(event) {
+		//alert(event.url);
+		//const invoice = event.url.replace(/.*?:\/\//g, "");
+
+		this.onRead(event.url);
+		//console.log(invoice);
+
+		// do something with the url, in our case navigate(route)
+	}
 
 	checkFingerprint() {
 		//Check with fingerprint, only for ios. Android might need extra setup
