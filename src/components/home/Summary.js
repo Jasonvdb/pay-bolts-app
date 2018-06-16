@@ -128,7 +128,8 @@ class Summary extends Component {
 					({ value, symbol }) => {
 						this.setState({
 							currentExchangeRate: value,
-							currentFiatSymbol: symbol
+							currentFiatSymbol: symbol,
+							isLoading: false
 						});
 					},
 					errorMessage => {
