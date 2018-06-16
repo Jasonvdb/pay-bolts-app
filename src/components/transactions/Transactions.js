@@ -1,5 +1,12 @@
 import React, { Component } from "react";
-import { Text, View, Platform, Alert } from "react-native";
+import {
+	Text,
+	View,
+	Platform,
+	Alert,
+	ListView,
+	RefreshControl
+} from "react-native";
 
 import Container from "../common/Container";
 import Heading from "../common/Heading";
@@ -14,18 +21,30 @@ class Transactions extends Component {
 		super(props);
 
 		this.state = {
-			payments: null,
+			paymentsDataSource: new ListView.DataSource({
+				rowHasChanged: (r1, r2) => r1 !== r2
+			}),
+			paymentCount: null,
 			currentExchangeRate: null,
 			currentFiatSymbol: null,
-			showFiatValueIds: {}
+			showFiatValueIds: {},
+			isRefreshing: false
 		};
 	}
 
 	componentDidMount() {
+		this.startInterval();
+	}
+
+	componentWillUnmount() {
+		this.stopInterval();
+	}
+
+	startInterval() {
 		this.fetchPayments();
 		this.interval = setInterval(() => {
 			this.fetchPayments();
-		}, 10000);
+		}, 15000);
 
 		getExchangeRate(
 			({ value, symbol }) => {
@@ -40,7 +59,7 @@ class Transactions extends Component {
 		);
 	}
 
-	componentWillUnmount() {
+	stopInterval() {
 		if (this.interval) {
 			clearInterval(this.interval);
 		}
@@ -52,7 +71,14 @@ class Transactions extends Component {
 			onSuccess: data => {
 				const { payments } = data;
 				payments.reverse();
-				this.setState({ payments });
+
+				const { paymentsDataSource } = this.state;
+
+				this.setState({
+					paymentsDataSource: paymentsDataSource.cloneWithRows(payments),
+					paymentCount: payments.length,
+					isRefreshing: false
+				});
 			},
 			onError: errorMessage => {
 				Alert.alert("Whoops", errorMessage);
@@ -60,37 +86,63 @@ class Transactions extends Component {
 		});
 	}
 
-	render() {
+	onRefresh() {
+		this.setState({ isRefreshing: true }, () => {
+			this.stopInterval();
+			this.startInterval();
+		});
+	}
+
+	renderList() {
 		const {
-			payments,
+			paymentsDataSource,
 			showFiatValueIds,
 			currentExchangeRate,
-			currentFiatSymbol
+			currentFiatSymbol,
+			isRefreshing
 		} = this.state;
 
 		return (
-			<Container scrollView={payments !== null}>
-				{payments === null ? (
+			<ListView
+				enabled
+				refreshControl={
+					<RefreshControl
+						refreshing={isRefreshing}
+						onRefresh={this.onRefresh.bind(this)}
+					/>
+				}
+				dataSource={paymentsDataSource}
+				renderRow={payment => (
+					<PaymentCard
+						key={payment.id}
+						{...payment}
+						onPress={() => {
+							showFiatValueIds[payment.id] = !showFiatValueIds[payment.id];
+
+							this.setState({
+								showFiatValueIds
+							});
+						}}
+						currentExchangeRate={currentExchangeRate}
+						currentFiatSymbol={currentFiatSymbol}
+						showFiatValue={showFiatValueIds[payment.id] === true}
+					/>
+				)}
+			/>
+		);
+	}
+
+	render() {
+		const { paymentCount } = this.state;
+
+		return (
+			<Container>
+				{!paymentCount === null ? (
 					<LargeIcon type="pending">Loading payments...</LargeIcon>
-				) : payments.length === 0 ? (
+				) : paymentCount === 0 ? (
 					<Heading type={"h1"}>No payments yet</Heading>
 				) : (
-					payments.map(payment => (
-						<PaymentCard
-							key={payment.id}
-							{...payment}
-							onPress={() => {
-								showFiatValueIds[payment.id] = !showFiatValueIds[payment.id];
-
-								this.setState({
-									showFiatValueIds
-								});
-							}}
-							currentExchangeRate={currentExchangeRate}
-							currentFiatSymbol={currentFiatSymbol}
-							showFiatValue={showFiatValueIds[payment.id] === true}
-						/>
-					))
+					this.renderList()
 				)}
 			</Container>
 		);
