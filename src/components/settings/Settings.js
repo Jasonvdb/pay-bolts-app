@@ -45,6 +45,7 @@ class Settings extends Component {
 
 	render() {
 		const { blockheight, id, network, version } = this.state;
+		const { navigation } = this.props;
 
 		const viewStyle = { marginBottom: 20 };
 
@@ -65,8 +66,12 @@ class Settings extends Component {
 					<NodeDetail label={"Network"} value={network} />
 					<NodeDetail label={"Node ID"} value={id} />
 					<NodeDetail label={"Node version"} value={version} />
-					<View />
-					<View />
+					<View>
+						<Button
+							onPress={() => navigation.push("NodeSettings", {})}
+							title="Show node settings"
+						/>
+					</View>
 				</View>
 			</Container>
 		);

@@ -30,6 +30,17 @@ export const getCache = async (key, onError) => {
 	}
 };
 
+export const removeCache = async (key, onError) => {
+	try {
+		await AsyncStorage.removeItem(key);
+	} catch (error) {
+		if (onError) {
+			onError(error);
+		}
+		console.log(error);
+	}
+};
+
 export const getCacheCallback = async (key, onSuccess, onError) => {
 	try {
 		const dataString = await AsyncStorage.getItem(key);

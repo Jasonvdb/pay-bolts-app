@@ -8,6 +8,7 @@ import Home from "../home/Home";
 import Scan from "../home/Scan";
 import Transactions from "../transactions/Transactions";
 import Settings from "../settings/Settings";
+import NodeSettings from "../settings/NodeSettings";
 import Channels from "../channels/Channels";
 
 import { colors } from "../../styles/brand";
@@ -253,37 +254,108 @@ const ChannelsScreenNavigator = StackNavigator(
 // 	}
 // );
 
+// const SettingsScreenNavigator = StackNavigator(
+// 	{
+// 		Settings: {
+// 			screen: Settings
+// 		},
+// 		NodeSettings: {
+// 			screen: NodeSettings
+// 		}
+// 	},
+// 	{
+// 		navigationOptions: {
+// 			...generalNavigationOptions,
+// 			//headerStyle: {
+// 			// ...generalNavigationOptions.headerStyle,
+// 			// backgroundColor: colors.brandPrimary,
+// 			// borderBottomWidth: 0
+// 			//},
+// 			tabBarIcon: ({ focused }) => {
+// 				// const source = focused
+// 				// 	? require("../../../images/icons/white/User.png")
+// 				// 	: require("../../../images/icons/gray/User.png");
+// 				return (
+// 					<Icon
+// 						name={"ios-cog"}
+// 						size={35}
+// 						color={
+// 							focused
+// 								? colors.brandActiveIconColor
+// 								: colors.brandInnactiveIconColor
+// 						}
+// 					/>
+// 				);
+// 				//return <Image style={{ width: 30, height: 30 }} source={source} />;
+// 			}
+// 		}
+// 	}
+// );
+
 const SettingsScreenNavigator = StackNavigator(
 	{
 		Settings: {
 			screen: Settings
+		},
+		NodeSettings: {
+			screen: NodeSettings
 		}
 	},
 	{
-		navigationOptions: {
-			...generalNavigationOptions,
-			//headerStyle: {
-			// ...generalNavigationOptions.headerStyle,
-			// backgroundColor: colors.brandPrimary,
-			// borderBottomWidth: 0
-			//},
-			tabBarIcon: ({ focused }) => {
-				// const source = focused
-				// 	? require("../../../images/icons/white/User.png")
-				// 	: require("../../../images/icons/gray/User.png");
-				return (
-					<Icon
-						name={"ios-cog"}
-						size={35}
-						color={
-							focused
-								? colors.brandActiveIconColor
-								: colors.brandInnactiveIconColor
-						}
-					/>
-				);
-				//return <Image style={{ width: 30, height: 30 }} source={source} />;
+		navigationOptions: ({ navigation, screenProps }) => {
+			const viewToShowTabBarOn = ["Settings"];
+
+			const showTab =
+				viewToShowTabBarOn.indexOf(navigation.state.routeName) > -1;
+
+			let androidOptions = {};
+			if (showTab && Platform.OS === "android") {
+				androidOptions = {
+					header: null
+				};
 			}
+
+			return {
+				...generalNavigationOptions,
+				// headerStyle: {
+				// 	...generalNavigationOptions.headerStyle,
+				// 	backgroundColor: colors.brandSeconday,
+				// 	borderBottomWidth: 0
+				// },
+
+				//*******HIDE TAB BAR */
+				tabBarVisible: showTab,
+				swipeEnabled: showTab,
+				//******* */
+
+				...androidOptions,
+
+				tabBarOnPress: ({ scene, jumpToIndex }) => {
+					jumpToIndex(scene.index);
+
+					//If they're on the 'properties' tab and they tab the tab icon again, it goes to the start of the route
+					if (scene.route.index > 0 && scene.focused) {
+						navigation.goBack();
+					}
+				},
+				tabBarIcon: ({ focused }) => {
+					// const source = focused
+					// 	? require("../../../images/icons/white/List.png")
+					// 	: require("../../../images/icons/gray/List.png");
+					// return <Image style={{ width: 30, height: 30 }} source={source} />;
+					return (
+						<Icon
+							name={"ios-cog"} //ios-resize-outline
+							size={35}
+							color={
+								focused
+									? colors.brandActiveIconColor
+									: colors.brandInnactiveIconColor
+							}
+						/>
+					);
+				}
+			};
 		}
 	}
 );
