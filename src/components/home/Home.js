@@ -47,13 +47,7 @@ class Home extends Component {
 	}
 
 	handleOpenURL(event) {
-		//alert(event.url);
-		//const invoice = event.url.replace(/.*?:\/\//g, "");
-
 		this.onRead(event.url);
-		//console.log(invoice);
-
-		// do something with the url, in our case navigate(route)
 	}
 
 	checkFingerprint() {
