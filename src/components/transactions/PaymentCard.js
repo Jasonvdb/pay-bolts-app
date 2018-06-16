@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
 	},
 	logo: {
 		resizeMode: "contain",
-		flex: 1.2,
+		flex: 1,
 		maxHeight: "100%"
 	},
 	// infoView: {
@@ -168,13 +168,13 @@ const styles = StyleSheet.create({
 		paddingRight: 10
 	},
 	idView: {
-		flex: 1,
+		flex: 2,
 		display: "flex",
 		flexDirection: "column",
 		justifyContent: "flex-start",
-		alignItems: "flex-start",
-		paddingLeft: 15,
-		paddingRight: 10
+		alignItems: "flex-start"
+		//paddingLeft: 15,
+		//paddingRight: 10
 	},
 
 	statusView: {
