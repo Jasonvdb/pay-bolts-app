@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import { Text, View, Alert } from "react-native";
-import axios from "axios";
+import { View, Alert, ListView, RefreshControl } from "react-native";
 
 import Container from "../common/Container";
 import Heading from "../common/Heading";
@@ -13,19 +12,33 @@ class Channels extends Component {
 	constructor(props) {
 		super(props);
 
-		this.state = { peers: null, showChannelIds: {}, connectingToNode: false };
+		this.state = {
+			peersDataSource: new ListView.DataSource({
+				rowHasChanged: (r1, r2) => r1 !== r2
+			}),
+			peerCount: null,
+			showChannelIds: {},
+			connectingToNode: false,
+			isRefreshing: false
+		};
 	}
 
 	componentDidMount() {
-		console.log("Channels mounted");
-
-		this.fetchPeers();
-		this.peersInterval = setInterval(() => {
-			this.fetchPeers();
-		}, 10000);
+		this.startInterval();
 	}
 
 	componentWillUnmount() {
+		this.stopInterval();
+	}
+
+	startInterval() {
+		this.fetchPeers();
+		this.peersInterval = setInterval(() => {
+			this.fetchPeers();
+		}, 20000);
+	}
+
+	stopInterval() {
 		if (this.peersInterval) {
 			clearInterval(this.peersInterval);
 		}
@@ -118,7 +131,14 @@ class Channels extends Component {
 		signedRequest({
 			method: "listpeers",
 			onSuccess: data => {
-				this.setState({ peers: data.peers });
+				const { peersDataSource } = this.state;
+				const { peers } = data;
+
+				this.setState({
+					peersDataSource: peersDataSource.cloneWithRows(peers || []),
+					peerCount: peers.length,
+					isRefreshing: false
+				});
 			},
 			onError: errorMessage => {
 				Alert.alert("Whoops", errorMessage);
@@ -126,8 +146,45 @@ class Channels extends Component {
 		});
 	}
 
+	onRefresh() {
+		this.setState({ isRefreshing: true }, () => {
+			this.stopInterval();
+			this.startInterval();
+		});
+	}
+
+	renderPeers() {
+		const { isRefreshing, peersDataSource, showChannelIds } = this.state;
+
+		return (
+			<ListView
+				enabled
+				refreshControl={
+					<RefreshControl
+						refreshing={isRefreshing}
+						onRefresh={this.onRefresh.bind(this)}
+					/>
+				}
+				dataSource={peersDataSource}
+				renderRow={peer => (
+					<PeerCard
+						key={peer.id}
+						{...peer}
+						onPress={() => {
+							showChannelIds[peer.id] = !showChannelIds[peer.id];
+							this.setState({
+								showChannelIds
+							});
+						}}
+						showChannels={showChannelIds[peer.id] === true}
+					/>
+				)}
+			/>
+		);
+	}
+
 	render() {
-		const { peers, showChannelIds, connectingToNode } = this.state;
+		const { peerCount, connectingToNode } = this.state;
 		const { navigation } = this.props;
 
 		if (connectingToNode) {
@@ -152,31 +209,14 @@ class Channels extends Component {
 		};
 
 		return (
-			<Container
-				actions={actions}
-				actionIcon={"add"}
-				scrollView={peers !== null}
-			>
-				{peers === null ? (
+			<Container actions={actions} actionIcon={"add"}>
+				{peerCount === null ? (
 					<LargeIcon type="pending">Loading peers...</LargeIcon>
-				) : peers.length === 0 ? (
+				) : peerCount.length === 0 ? (
 					<Heading type={"h1"}>No channels yet</Heading>
 				) : (
-					peers.map(peer => (
-						<PeerCard
-							key={peer.id}
-							{...peer}
-							onPress={() => {
-								showChannelIds[peer.id] = !showChannelIds[peer.id];
-								this.setState({
-									showChannelIds
-								});
-							}}
-							showChannels={showChannelIds[peer.id] === true}
-						/>
-					))
+					this.renderPeers()
 				)}
-				<View style={{ marginBottom: 90 }} />
 			</Container>
 		);
 	}
