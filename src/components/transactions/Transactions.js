@@ -1,16 +1,8 @@
 import React, { Component } from "react";
-import {
-	Text,
-	View,
-	Platform,
-	Alert,
-	ListView,
-	RefreshControl
-} from "react-native";
+import { Alert, ListView, RefreshControl } from "react-native";
 
 import Container from "../common/Container";
 import Heading from "../common/Heading";
-import { spaces } from "../../styles/brand";
 import signedRequest from "../../helpers/signedRequest";
 import LargeIcon from "../common/LargeIcon";
 import PaymentCard from "./PaymentCard";
@@ -137,7 +129,7 @@ class Transactions extends Component {
 
 		return (
 			<Container>
-				{!paymentCount === null ? (
+				{paymentCount === null ? (
 					<LargeIcon type="pending">Loading payments...</LargeIcon>
 				) : paymentCount === 0 ? (
 					<Heading type={"h1"}>No payments yet</Heading>

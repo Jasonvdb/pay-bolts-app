@@ -170,7 +170,7 @@ class NodeSettings extends Component {
 						<Button onPress={this.resetApp.bind(this)} title="Reset app" />
 					) : null}
 
-					{this.renderTestButton()}
+					{/* {this.renderTestButton()} */}
 				</View>
 			</Container>
 		);

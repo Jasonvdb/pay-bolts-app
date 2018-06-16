@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
 		borderWidth: 0.3,
 		borderColor: colors.brandCardBorderColor,
 		backgroundColor: colors.brandCardBackground,
-		borderRadius: 6,
+		borderRadius: 4,
 		//height: 180,
 		marginBottom: spaces.marginCard,
 		marginRight: spaces.marginCard,

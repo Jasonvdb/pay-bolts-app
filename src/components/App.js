@@ -3,7 +3,7 @@ import React, { Component } from "react";
 import Onboarding from "./routes/Onboarding";
 import AuthedTab from "./routes/AuthedTab";
 import LoadingScreen from "./common/LoadingScreen";
-import { setCache, getCache } from "../helpers/localcache";
+import { getCache } from "../helpers/localcache";
 
 class App extends Component {
 	constructor(props) {
@@ -33,8 +33,7 @@ class App extends Component {
 		const secret = await getCache("secret");
 
 		if (apiUrl && apiKey && secret) {
-			this.setState({ isSetup: true }, ()=>this.stopInterval());
-			
+			this.setState({ isSetup: true }, () => this.stopInterval());
 		} else {
 			this.setState({ isSetup: false });
 		}

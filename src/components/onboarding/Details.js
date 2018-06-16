@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import { Image, View, Alert } from "react-native";
-import axios from "axios";
 import crypto from "crypto";
 
 import Container from "../common/Container";
@@ -29,7 +28,6 @@ export default class Details extends Component {
 		}
 
 		this.setState({ isSubmitting: true });
-		console.log("Checking details...");
 		signedRequest({
 			apiUrl,
 			apiKey,
