@@ -207,7 +207,7 @@ class Home extends Component {
 
 		const actions = {
 			edit: {
-				label: "Scan",
+				label: "Scan invoice",
 				callback: () => {
 					this.setState({ paymentSuccessfull: false });
 
@@ -220,12 +220,26 @@ class Home extends Component {
 			}
 		};
 
+		const leftActions = {
+			edit: {
+				label: "Create invoice",
+				callback: () => {
+					//this.setState({ paymentSuccessfull: false });
+					navigation.push("CreateInvoice", {});
+				},
+				icon: "invoice"
+			}
+		};
+
 		const showSummary =
 			!paymentSuccessfull && !isDecodingInvoice && !isPaying && !msatoshi;
 
+		const hideActionButtons = isPaying || isDecodingInvoice || msatoshi;
+
 		return (
 			<Container
-				actions={isPaying || isDecodingInvoice || msatoshi ? null : actions}
+				leftActions={hideActionButtons ? null : leftActions}
+				actions={hideActionButtons ? null : actions}
 				// keyboardScroll={!showSummary}
 			>
 				<View style={{ flex: 1, justifyContent: "space-between" }}>

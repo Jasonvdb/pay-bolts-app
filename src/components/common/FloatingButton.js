@@ -19,14 +19,25 @@ const icons = {
 	),
 	list: <Icon name={"ios-arrow-back"} size={30} color={colors.brandLight} />,
 	arrows: <Icon name={"ios-arrow-back"} size={30} color={colors.brandLight} />,
-	edit: <Icon name={"ios-create-outline"} size={30} color={colors.brandLight} />
+	edit: (
+		<Icon name={"ios-create-outline"} size={30} color={colors.brandLight} />
+	),
+
+	//ios-download-outline
+	invoice: (
+		<Icon
+			name={"ios-arrow-dropdown-outline"}
+			size={30}
+			color={colors.brandLight}
+		/>
+	)
 };
 
-const FloatingButton = ({ actions, actionIcon }) => {
+const FloatingButton = ({ actions, actionIcon, position }) => {
 	const color = brandInfo;
 
 	let floatingActions = [];
-	let position = 1;
+	let index = 1;
 
 	let mainIcon = actionIcon ? icons[actionIcon] : icons.list;
 
@@ -44,15 +55,16 @@ const FloatingButton = ({ actions, actionIcon }) => {
 				text: label,
 				icon: icons[icon] || icons.arrows,
 				name: key,
-				position,
+				index,
 				textColor: brandGrey3
 			});
-			position++;
+			index++;
 		});
 	}
 
 	return (
 		<FloatingAction
+			position={position || "right"}
 			onPressMain={onPressMain}
 			showBackground={!onPressMain}
 			distanceToEdge={paddingFAB}
@@ -70,7 +82,10 @@ const FloatingButton = ({ actions, actionIcon }) => {
 };
 
 FloatingButton.propTypes = {
-	type: PropTypes.oneOf(["primary", "secondary", "default"])
+	type: PropTypes.oneOf(["primary", "secondary", "default"]),
+	actions: PropTypes.object.isRequired,
+	actionIcon: PropTypes.string,
+	position: PropTypes.string
 };
 
 export default FloatingButton;

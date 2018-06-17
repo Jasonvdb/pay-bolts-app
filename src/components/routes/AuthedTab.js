@@ -6,6 +6,7 @@ import Icon from "react-native-vector-icons/Ionicons";
 
 import Home from "../home/Home";
 import Scan from "../home/Scan";
+import CreateInvoice from "../home/CreateInvoice";
 import Transactions from "../transactions/Transactions";
 import Settings from "../settings/Settings";
 import NodeSettings from "../settings/NodeSettings";
@@ -33,7 +34,8 @@ const generalNavigationOptions = {
 const HomeScreenNavigator = StackNavigator(
 	{
 		Home: { screen: Home },
-		ScanInvoice: { screen: Scan }
+		ScanInvoice: { screen: Scan },
+		CreateInvoice: { screen: CreateInvoice }
 		// ViewInvoice: { screen: Invoice }
 	},
 	{

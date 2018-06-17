@@ -20,7 +20,9 @@ const Container = ({
 	keyboardScroll,
 	noSafeArea,
 	actions,
-	actionIcon
+	actionIcon,
+	leftActions,
+	leftActionIcon
 }) => {
 	const style = {
 		backgroundColor: image ? brandBackground1 : brandLight,
@@ -35,9 +37,20 @@ const Container = ({
 		newChildren = children;
 	}
 
-	const actionElement = actions ? (
-		<FloatingButton actions={actions} actionIcon={actionIcon} />
-	) : null;
+	const actionElement = (
+		<View>
+			{leftActions ? (
+				<FloatingButton
+					position="left"
+					actions={leftActions}
+					actionIcon={leftActionIcon}
+				/>
+			) : null}
+			{actions ? (
+				<FloatingButton actions={actions} actionIcon={actionIcon} />
+			) : null}
+		</View>
+	);
 
 	if (keyboardScroll) {
 		return (
