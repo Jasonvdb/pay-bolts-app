@@ -176,7 +176,7 @@ class Home extends Component {
 							</Heading>
 						) : null}
 
-						<Heading type={"h2"}>{msatoshi / 100} Satoshis</Heading>
+						<Heading type={"h2"}>{msatoshi / 1000} Satoshis</Heading>
 					</Animatable.View>
 				</View>
 			);

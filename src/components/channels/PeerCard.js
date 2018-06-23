@@ -48,7 +48,7 @@ const Channel = ({ channel_id, state, spendable_msatoshi }) => {
 		<View>
 			<Heading type="h4">Channel state: {state}</Heading>
 			{spendable_msatoshi ? (
-				<Heading type="h4">{spendable_msatoshi} Satoshis</Heading>
+				<Heading type="h4">{spendable_msatoshi / 1000} Satoshis</Heading>
 			) : null}
 		</View>
 	);

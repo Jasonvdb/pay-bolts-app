@@ -67,7 +67,8 @@ class Channels extends Component {
 	}
 
 	fundChannel(nodeId) {
-		const satoshis = 1000000;
+		//TODO get this from the user (or use some percentage of the users wallet balance)
+		const satoshis = 15000000; //0.2 BTC
 
 		console.log("Funding....");
 
