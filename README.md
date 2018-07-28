@@ -1,4 +1,4 @@
-# pay-bolts-app
+# PayBolts App
 Lightning network remote app for a [c-lightning](https://github.com/ElementsProject/lightning) node. 
 Built with React Native (Both iOS and Android)
 
@@ -14,3 +14,22 @@ https://media.giphy.com/media/8gWURCjSFjyqtUJe71/giphy.gif)
 ![Screenshot](
 https://raw.githubusercontent.com/Jasonvdb/pay-bolts-app/master/screenshot.png)
 
+
+
+
+## Installation
+
+```
+git clone https://github.com/Jasonvdb/pay-bolts-app.git
+
+cd pay-bolts-app/
+
+npm install
+
+```
+
+For iOS open `ios/PayBoltsApp.xcodeproj` with Xcode
+
+For Android open `android/`
+
+Because of the app requiring the camera you'll have to use Xcode or Android studio to build for your phone.
